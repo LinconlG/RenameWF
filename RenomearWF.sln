@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenomearWF", "RenomearWF\RenomearWF.csproj", "{76CB3B76-2974-4997-B6E6-2AB2270D28CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76CB3B76-2974-4997-B6E6-2AB2270D28CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76CB3B76-2974-4997-B6E6-2AB2270D28CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76CB3B76-2974-4997-B6E6-2AB2270D28CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76CB3B76-2974-4997-B6E6-2AB2270D28CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2DB6CF0B-061C-4DEA-96CC-0A5FAD0F1079}
+	EndGlobalSection
+EndGlobal
