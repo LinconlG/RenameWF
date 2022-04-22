@@ -18,6 +18,8 @@ namespace RenomearWF
         string extensao;
         string modrev;//estilo de "rev." para ser alterado
 
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             try
@@ -29,6 +31,7 @@ namespace RenomearWF
 
                 string[] nomesArquivos = new string[linhas];
                 string[] revisoes = new string[linhas];
+
 
                 DirectoryInfo diretorioPasta = new DirectoryInfo($@"{diretorio}");
 
@@ -55,47 +58,71 @@ namespace RenomearWF
                     }
                 }
 
+                DirectoryInfo[] listaDePastas = diretorioPasta.GetDirectories();
                 FileInfo[] listaArquivos = diretorioPasta.GetFiles();
 
-                foreach (FileInfo arquivo in listaArquivos)
+                RenomearArquivo(listaArquivos, nomesArquivos, revisoes);
+
+
+
+
+                foreach (DirectoryInfo item in listaDePastas)
                 {
-                    extensao = Path.GetExtension(arquivo.FullName);
-                    int ind = Path.GetFileName(arquivo.FullName).ToLower().IndexOf($"{modrev}");
-                    string caminhoCompleto = arquivo.FullName;
-                    string nomeComExtensao = Path.GetFileName(caminhoCompleto);
+
+                    //copiar o codigo de cima
+
+                    int ind = Path.GetDirectoryName(item.FullName).ToLower().IndexOf($"{modrev}");
+                    string caminhoCompleto = item.FullName;
                     bool flag = false;
 
                     for (int i = 0; i < linhas; i++)
                     {
+
                         if (ind != -1)
                         {
                             if (flag == false)
                             {
-                                int inddot = Path.GetFileName(arquivo.FullName).LastIndexOf(".");
-                                string rev = Path.GetFileName(arquivo.FullName).Substring(ind, inddot - ind);
+                                int inddot = Path.GetFileName(item.FullName).LastIndexOf(".");
+                                string rev = Path.GetFileName(item.FullName).Substring(ind, inddot - ind);
                                 caminhoCompleto = caminhoCompleto.Replace($"{rev}", $"");
-                                nomeComExtensao = Path.GetFileName(caminhoCompleto);
-                                flag = true;
-                            }
-                            if (nomeComExtensao == $"{nomesArquivos[i]}{extensao}")
-                            {
-                                File.Move(arquivo.FullName, caminhoCompleto);
+                                File.Move(item.FullName, caminhoCompleto);
 
-                                File.Move(caminhoCompleto, caminhoCompleto.Replace($"{extensao}", $" Rev.{revisoes[i]}{extensao}"));
+                                File.Move(caminhoCompleto, Path.Combine(caminhoCompleto, $"{item.FullName} Rev.{revisoes[i]}"));
+
+                                flag = true;
+
+                                if (checkBox1.Enabled)
+                                {
+
+                                    //não executando
+                                    DirectoryInfo diretorio2 = new DirectoryInfo($@"{item.FullName} Rev.{revisoes[i]}");
+                                    FileInfo[] listaArquivosPasta = diretorio2.GetFiles();
+
+                                    RenomearArqPasta(diretorio2);
+                                }
                                 break;
                             }
-
                         }
                         else
                         {
-                            if (nomeComExtensao == $"{nomesArquivos[i]}{extensao}")
+                            Directory.Move(caminhoCompleto, Path.Combine(caminhoCompleto, $"{caminhoCompleto} Rev.{revisoes[i]}"));
+
+                            if (checkBox1.Enabled)
                             {
-                                File.Move(arquivo.FullName, arquivo.FullName.Replace($"{extensao}", $" Rev.{revisoes[i]}{extensao}"));
-                                break;
+                                DirectoryInfo diretorio2 = new DirectoryInfo($@"{item.FullName} Rev.{revisoes[i]}");
+                                FileInfo[] listaArquivosPasta = diretorio2.GetFiles();
+
+                                RenomearArqPasta(diretorio2);
                             }
+                            break;
+
                         }
+
+
                     }
+
                 }
+
                 wb.Close();
                 planilha.Quit();
 
@@ -104,12 +131,12 @@ namespace RenomearWF
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                
+
             }
         }
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -161,8 +188,89 @@ namespace RenomearWF
 
                 MessageBox.Show(ex.Message);
             }
+
+
+
+        }
+
+        public void RenomearArquivo(FileInfo[] listaArquivos, string[] nomeArq, string[] revs)
+        {
+            foreach (FileInfo arquivo in listaArquivos)
+            {
+
+                extensao = Path.GetExtension(arquivo.FullName);
+                int ind = Path.GetFileName(arquivo.FullName).ToLower().IndexOf($"{modrev}");
+                string caminhoCompleto = arquivo.FullName;
+                string nomeComExtensao = Path.GetFileName(caminhoCompleto);
+                bool flag = false;
+
+                for (int i = 0; i < linhas; i++)
+                {
+                    if (ind != -1)
+                    {
+                        if (flag == false)
+                        {
+                            int inddot = Path.GetFileName(arquivo.FullName).LastIndexOf(".");
+                            string rev = Path.GetFileName(arquivo.FullName).Substring(ind, inddot - ind);
+                            caminhoCompleto = caminhoCompleto.Replace($"{rev}", $"");
+                            nomeComExtensao = Path.GetFileName(caminhoCompleto);
+                            flag = true;
+                        }
+                        if (nomeComExtensao == $"{nomeArq[i]}{extensao}")
+                        {
+                            File.Move(arquivo.FullName, caminhoCompleto);
+
+                            File.Move(caminhoCompleto, caminhoCompleto.Replace($"{extensao}", $" Rev.{revs[i]}{extensao}"));
+                            break;
+                        }
+
+                    }
+                    else
+                    {
+                        if (nomeComExtensao == $"{nomeArq[i]}{extensao}")
+                        {
+                            File.Move(arquivo.FullName, arquivo.FullName.Replace($"{extensao}", $" Rev.{revs[i]}{extensao}"));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void RenomearArqPasta(DirectoryInfo dir)
+        {
             
-            
+            FileInfo[] listaArquivos = dir.GetFiles();
+
+            string nomePasta = Path.GetFileName(dir.FullName);
+            int inddot = nomePasta.LastIndexOf(".");
+
+            if (inddot != -1)
+            {
+                string ext;
+                bool flag = false;
+                string revp = nomePasta.Substring(inddot - 3);
+                string reva;
+                string temp;
+
+                foreach (FileInfo arquivo in listaArquivos)
+                {
+                    flag = Path.GetFileName(arquivo.FullName).ToLower().Contains("rev.");
+                    ext = Path.GetExtension(arquivo.FullName);
+
+                    if (flag)
+                    {
+                        reva = Path.GetFileNameWithoutExtension(arquivo.FullName).Substring(Path.GetFileName(arquivo.FullName).LastIndexOf(".") - 5);
+                        File.Move(arquivo.FullName, arquivo.FullName.Replace($" {reva}{ext}", $"{ext}"));
+                        temp = arquivo.FullName.Replace($" {reva}{ext}", $"{ext}");
+                        File.Move(temp, temp.Replace($"{ext}", $" {revp}{ext}"));
+                    }
+                    else
+                    {
+                        File.Move(arquivo.FullName, arquivo.FullName.Replace($"{ext}", $" {revp}{ext}"));
+                    }
+                }
+            }
 
         }
     }
